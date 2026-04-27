@@ -1,0 +1,83 @@
+Step 1: Prepare App-1 
+app1/app.py 
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    return "Hello from App 1!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+app1/requirements.txt 
+flask
+app1/Dockerfile 
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY app.py .
+EXPOSE 5000
+CMD ["python", "app.py"]
+✔ App-1 is the service provider
+________________________________________
+🔹 Step 2: Create App-2 (NEW – Service Consumer)
+Create a new folder:
+Multi-container-app/app2/
+app2/app.py
+import requests
+
+response = requests.get("http://app1:5000/")
+print("Response from App 1:", response.text)
+📌 Important:
+•	app1 is the service name
+•	Docker Compose DNS resolves it automatically
+________________________________________
+app2/requirements.txt
+requests
+________________________________________
+app2/Dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY app.py .
+CMD ["python", "app.py"]
+
+pgm-3_Multicontainer /docker-compose.yml
+yaml
+Copy code
+version: "3.9"
+
+services:
+  app1:
+    build: ./app1
+    container_name: app1
+    ports:
+      - "5000:5000"
+
+  app2:
+    build: ./app2
+    depends_on:
+      - app1
+
+Command to run:
+docker-compose up --build 
+
+Terminal Output
+Response from App 1: Hello from App 1!
+Browser Output
+Open: http://localhost:5000
+Hello from App 1!
+  
+Verify in Docker Desktop
+•	Go to Docker Desktop → Containers
+•	You’ll see:
+o	app1 (running)
+o	app2 (completed)
+Stop Containers
+CTRL + C
+or
+docker-compose down
+
