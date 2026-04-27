@@ -37,3 +37,12 @@ docker run -p 8095:5000 pg3
 Open browser:
 http://localhost:8095
 
+🔹 Step 5: Push Image to Docker Hub
+docker login
+docker tag flask-docker-app yourusername/pg3
+docker push yourusername/pg3
+
+
+
+Also open docker app and check the image created and can start the image.
+
